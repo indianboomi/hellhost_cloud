@@ -1,20 +1,22 @@
-// Import Firebase
+// Firebase imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getAuth,
   signInWithPopup,
   GoogleAuthProvider,
-  GithubAuthProvider
+  GithubAuthProvider,
+  signOut,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// Your config
+// 🔑 PASTE YOUR FIREBASE CONFIG HERE
 const firebaseConfig = {
   apiKey: "AIzaSyArPkzW5MtYGqsfBPyargJk0QXt_gAoW4A",
   authDomain: "hellhost-d12d4.firebaseapp.com",
   projectId: "hellhost-d12d4",
 };
 
-// Init
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
@@ -22,22 +24,44 @@ const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 const githubProvider = new GithubAuthProvider();
 
+// Elements
+const googleBtn = document.getElementById("googleBtn");
+const githubBtn = document.getElementById("githubBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const userText = document.getElementById("user");
+
 // Google Login
-window.googleLogin = function () {
+googleBtn.addEventListener("click", () => {
   signInWithPopup(auth, googleProvider)
     .then((result) => {
-      document.getElementById("user").innerText =
-        "Welcome " + result.user.displayName;
+      console.log("Google login success");
     })
-    .catch((error) => alert(error.message));
-};
+    .catch((error) => {
+      alert(error.message);
+    });
+});
 
 // GitHub Login
-window.githubLogin = function () {
+githubBtn.addEventListener("click", () => {
   signInWithPopup(auth, githubProvider)
     .then((result) => {
-      document.getElementById("user").innerText =
-        "Welcome " + result.user.displayName;
+      console.log("GitHub login success");
     })
-    .catch((error) => alert(error.message));
-};
+    .catch((error) => {
+      alert(error.message);
+    });
+});
+
+// Logout
+logoutBtn.addEventListener("click", () => {
+  signOut(auth);
+});
+
+// Detect user
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    userText.innerText = "Welcome " + user.displayName;
+  } else {
+    userText.innerText = "Not logged in";
+  }
+});
